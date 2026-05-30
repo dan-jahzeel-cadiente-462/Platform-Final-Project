@@ -60,7 +60,7 @@ ENV DEFAULT_URI="http://localhost"
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
 # Run optimization and cache warmup during build
-RUN composer install --no-dev --optimize-autoloader && \
+RUN composer install --no-dev --optimize-autoloader --no-scripts && \
     # Download JavaScript vendor assets managed by AssetMapper
     php bin/console importmap:install && \
     # Precompile all assets for production performance
