@@ -7,7 +7,12 @@ echo "Waiting for database to be ready..."
 # we keep waiting because MySQL might still be setting up the user.
 until php -r "
 try {
-    new PDO('mysql:host=database;port=3306', 'final-project', 'final-project-password');
+    // On Railway, we use the host and credentials provided by the MySQL service
+    \$host = getenv('MYSQLHOST') ?: 'database';
+    \$port = getenv('MYSQLPORT') ?: '3306';
+    \$user = getenv('MYSQLUSER') ?: 'final-project';
+    \$pass = getenv('MYSQLPASSWORD') ?: 'final-project-password';
+    new PDO(\"mysql:host=\$host;port=\$port\", \$user, \$pass);
     exit(0);
 } catch (Exception \$e) {
     exit(1);
