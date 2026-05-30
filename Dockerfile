@@ -57,7 +57,7 @@ ENV DATABASE_URL="mysql://dummy:dummy@127.0.0.1:3306/dummy"
 ENV DEFAULT_URI="http://localhost"
 
 # Run optimization and cache warmup during build
-RUN composer dump-autoload --optimize --classmap-authoritative --no-dev && \
+RUN composer install --no-dev --optimize-autoloader && \
     # Download JavaScript vendor assets managed by AssetMapper
     php bin/console importmap:install && \
     # Precompile all assets for production performance
