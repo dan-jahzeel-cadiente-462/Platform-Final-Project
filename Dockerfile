@@ -8,6 +8,7 @@ ENV APP_DEBUG=0
 # Install system dependencies for Symfony and MySQL
 RUN apk add --no-cache \
     acl \
+    ca-certificates \
     fcgi \
     file \
     gettext \
@@ -53,7 +54,7 @@ ENV APP_DEBUG=0
 
 # Provide dummy environment variables for build-time console commands.
 # These allow the Symfony Kernel to boot without a real database during the build.
-ENV DATABASE_URL="mysql://dummy:dummy@127.0.0.1:3306/dummy"
+ENV DATABASE_URL="mysql://dummy:dummy@127.0.0.1:3306/dummy?serverVersion=8.0.32&charset=utf8mb4"
 ENV DEFAULT_URI="http://localhost"
 
 # Allow Composer plugins to run as root during build
@@ -63,19 +64,15 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 # database connection attempts before the database is ready.
 ENV SYMFONY_SKIP_SCRIPTS=1
 
-# Run optimization and cache warmup during build
-RUN composer install --no-dev --optimize-autoloader && \
-    # Download JavaScript vendor assets managed by AssetMapper
+# Run optimization and cache warmup during build. 
+# We ensure mkdir and permissions happen BEFORE commands that write to those folders.
+RUN mkdir -p var/cache var/log assets/vendor public/assets && \
+    composer install --no-dev --optimize-autoloader && \
     php bin/console importmap:install && \
-    # Precompile all assets for production performance
     php bin/console asset-map:compile && \
-    # Warm up cache without requiring a live database connection during build
     php bin/console cache:warmup --no-optional-warmers && \
-    # Set permissions
-    mkdir -p var/cache var/log assets/vendor public/assets && \
     chown -R www-data:www-data var assets/vendor public/assets && \
     chmod -R 775 var assets/vendor public/assets && \
-    # Fix line endings
     sed -i 's/\r$//' entrypoint.sh && \
     chmod +x entrypoint.sh
 
