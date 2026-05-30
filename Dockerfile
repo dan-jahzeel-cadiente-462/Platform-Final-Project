@@ -51,6 +51,11 @@ COPY . .
 ENV APP_ENV=prod
 ENV APP_DEBUG=0
 
+# Provide dummy environment variables for build-time console commands.
+# These allow the Symfony Kernel to boot without a real database during the build.
+ENV DATABASE_URL="mysql://dummy:dummy@127.0.0.1:3306/dummy"
+ENV DEFAULT_URI="http://localhost"
+
 # Run optimization and cache warmup during build
 RUN composer dump-autoload --optimize --classmap-authoritative --no-dev && \
     # Download JavaScript vendor assets managed by AssetMapper
