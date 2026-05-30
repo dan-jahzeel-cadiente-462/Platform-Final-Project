@@ -1,0 +1,41 @@
+services:
+  app:
+    build: .
+    environment:
+      DATABASE_URL: mysql://${MYSQL_USER:-final-project}:${MYSQL_PASSWORD:-final-project-password}@database:3306/${MYSQL_DATABASE:-final-project}?serverVersion=8.0.32&charset=utf8mb4
+      APP_SECRET: ${APP_SECRET:-f3f6e8061e86095378772787e9545468}
+      APP_ENV: prod
+      DEFAULT_URI: ${DEFAULT_URI:-http://localhost}
+    depends_on:
+      database:
+        condition: service_healthy
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./public:/var/www/html/public:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx-main.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - app
+
+  database:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-final-project-root-password}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-final-project}
+      MYSQL_USER: ${MYSQL_USER:-final-project}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-final-project-password}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:

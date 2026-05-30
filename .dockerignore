@@ -1,0 +1,10 @@
+.git
+vendor/
+var/
+.env.local
+.env.local.php
+.env.test
+.env.test.local
+docker-compose.yaml
+docker-compose.override.yaml
+Dockerfile
