@@ -56,6 +56,9 @@ ENV APP_DEBUG=0
 ENV DATABASE_URL="mysql://dummy:dummy@127.0.0.1:3306/dummy"
 ENV DEFAULT_URI="http://localhost"
 
+# Allow Composer plugins to run as root during build
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
 # Run optimization and cache warmup during build
 RUN composer install --no-dev --optimize-autoloader && \
     # Download JavaScript vendor assets managed by AssetMapper
