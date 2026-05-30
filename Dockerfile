@@ -59,8 +59,12 @@ ENV DEFAULT_URI="http://localhost"
 # Allow Composer plugins to run as root during build
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
+# Skip Symfony auto-scripts during composer install to prevent 
+# database connection attempts before the database is ready.
+ENV SYMFONY_SKIP_SCRIPTS=1
+
 # Run optimization and cache warmup during build
-RUN composer install --no-dev --optimize-autoloader --no-scripts && \
+RUN composer install --no-dev --optimize-autoloader && \
     # Download JavaScript vendor assets managed by AssetMapper
     php bin/console importmap:install && \
     # Precompile all assets for production performance
