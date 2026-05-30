@@ -16,7 +16,6 @@ RUN apk add --no-cache \
     icu-dev \
     libzip-dev \
     mariadb-dev \
-    nginx \
     zip \
     zlib-dev
 
@@ -74,14 +73,8 @@ RUN mkdir -p var/cache var/log assets/vendor public/assets && \
     php bin/console cache:warmup --no-optional-warmers && \
     chown -R www-data:www-data var assets/vendor public/assets && \
     chmod -R 775 var assets/vendor public/assets && \
-    sed -i 's/\r$//' entrypoint.sh start.sh && \
-    chmod +x entrypoint.sh start.sh
+    sed -i 's/\r$//' entrypoint.sh && \
+    chmod +x entrypoint.sh
 
-# Copy Nginx configuration files
-COPY nginx.conf /etc/nginx/nginx.conf
-COPY nginx-main.conf /etc/nginx/conf.d/default.conf
-
-# Expose the HTTP port Railway expects
-EXPOSE 8080
-
-ENTRYPOINT ["/var/www/html/start.sh"]
+ENTRYPOINT ["/var/www/html/entrypoint.sh"]
+CMD ["php-fpm"]
